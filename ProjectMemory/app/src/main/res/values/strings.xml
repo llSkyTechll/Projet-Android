@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">MemoryProject</string>
+
+    <!-- Main menu -->
     <string name="btn_play">PLAY</string>
+
+    <!-- Grid Choice -->
+    <string name="btn_2x2">2 x 2</string>
+    <string name="btn_4x4">4 x 4</string>
+    <string name="btn_6x6">6 x 6</string>
+    <string name="textView_pickAGrid">Choisissez les dimensions de la grille</string>
 </resources>
