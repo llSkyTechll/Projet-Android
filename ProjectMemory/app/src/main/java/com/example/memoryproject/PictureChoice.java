@@ -2,6 +2,7 @@ package com.example.memoryproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
@@ -15,7 +16,9 @@ import android.widget.ImageView;
 public class PictureChoice extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMAGE = 1;
+    private static int RESULT_PERMISSION_CAMERA = 100;
     Button buttonLoadImage;
+    Button btn_takePicture;
     ImageView imageView;
     Uri selectedImage;
 
@@ -25,7 +28,12 @@ public class PictureChoice extends AppCompatActivity {
         setContentView(R.layout.activity_picture_choice);
 
         imageView = (ImageView)findViewById(R.id.imgView);
-        buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
+        buttonLoadImage = findViewById(R.id.buttonLoadPicture);
+        btn_takePicture = findViewById(R.id.btn_takePicture);
+        setListener();
+    }
+
+    private void setListener(){
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -33,10 +41,24 @@ public class PictureChoice extends AppCompatActivity {
                 openGallery();
             }
         });
+
+        btn_takePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestCameraPermission();
+            }
+        });
     }
+
+    private void requestCameraPermission(){
+        if (ContextCompat.checkSelfPermission(this , Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
+            ActivityCompat.requestPermissions(this , new String[] {Manifest.permission.CAMERA}, 1);
+        }
+    }
+
     private  void permission(){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},100);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RESULT_PERMISSION_CAMERA);
             return;
         }
     }
@@ -46,7 +68,7 @@ public class PictureChoice extends AppCompatActivity {
         gallery.setType("image/*");
         gallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         gallery.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(gallery, "Select pictures"), 3);
+        startActivityForResult(Intent.createChooser(gallery, "Select pictures"), 1);
     }
 
     @Override
