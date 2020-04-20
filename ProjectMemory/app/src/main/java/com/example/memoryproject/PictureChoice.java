@@ -10,10 +10,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 public class PictureChoice extends AppCompatActivity {
+
     private static int RESULT_LOAD_IMAGE = 1;
     Button buttonLoadImage;
     ImageView imageView;
     Uri selectedImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,10 +30,15 @@ public class PictureChoice extends AppCompatActivity {
             }
         });
     }
+
     private void openGallery(){
         Intent gallery = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(gallery, RESULT_LOAD_IMAGE);
+        gallery.setType("image/*");
+        gallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        gallery.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(gallery, "Select pictures"), 3);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
