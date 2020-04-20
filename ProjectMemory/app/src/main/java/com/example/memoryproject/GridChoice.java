@@ -54,9 +54,9 @@ public class GridChoice extends AppCompatActivity {
     }
 
     private void relocatePictureChoice(){
-        /*Intent pictureChoiceIntent = new Intent(this, PictureChoice.class);
+        Intent pictureChoiceIntent = new Intent(this, PictureChoice.class);
         pictureChoiceIntent.putExtra("picturesRequired", picturesRequired);
-        startActivity(pictureChoiceIntent);*/
+        startActivity(pictureChoiceIntent);
     }
 
     private void showMessage(String message){
