@@ -39,6 +39,7 @@ public class PictureChoice extends AppCompatActivity {
         btnPickImage = findViewById(R.id.btn_pickImage);
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
+        bitmaps = new ArrayList<>();
 
         setListener();
 
@@ -80,7 +81,7 @@ public class PictureChoice extends AppCompatActivity {
     private void getImages(int requestCode, int resultCode, @Nullable Intent data){
         if (requestCode == 1 && resultCode == RESULT_OK){
             imageView = findViewById(R.id.imageView);
-            bitmaps = new ArrayList<>();
+
             clipData = data.getClipData();
             if (clipData !=null){
                 for (int i = 0; i < clipData.getItemCount();i++){
