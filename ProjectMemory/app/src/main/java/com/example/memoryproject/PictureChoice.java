@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -29,11 +30,16 @@ public class PictureChoice extends AppCompatActivity {
     ClipData clipData;
     Uri imageUri;
     InputStream inputStream;
+    Intent intent;
+    int picturesRequired;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_choice);
         btnPickImage = findViewById(R.id.btn_pickImage);
+        intent = getIntent();
+        picturesRequired = intent.getIntExtra("picturesRequired",2);
+
         setListener();
 
     }
@@ -77,8 +83,10 @@ public class PictureChoice extends AppCompatActivity {
             bitmaps = new ArrayList<>();
             clipData = data.getClipData();
             if (clipData !=null){
-                for (int i =0;i<clipData.getItemCount();i++){
-                    imageUri =clipData.getItemAt(i).getUri();
+                for (int i = 0; i < clipData.getItemCount();i++){
+                    if ( clipData.getItemCount() <= picturesRequired){
+                        imageUri = clipData.getItemAt(i).getUri();
+                        picturesRequired--;
                     try {
                         inputStream = getContentResolver().openInputStream(imageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
@@ -87,6 +95,8 @@ public class PictureChoice extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                }
+
             }else {
                 imageUri = data.getData();
                 try {
@@ -119,5 +129,9 @@ public class PictureChoice extends AppCompatActivity {
                 }
             }
         }).start();
+    }
+
+    private void showMessage(String message){
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
 }
