@@ -3,23 +3,15 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <ImageView
-        android:id="@+id/imgView"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"></ImageView>
     <Button
-        android:id="@+id/buttonLoadPicture"
+        android:id="@+id/btn_pickImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="Load Picture"
-        android:layout_gravity="center"></Button>
+        android:text="Pick Image" />
 
-    <Button
-        android:id="@+id/btn_takePicture"
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="246dp"
-        android:layout_weight="1"
-        android:text="Button" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn_pickImage"
+        android:id="@+id/imageView"/>
 </LinearLayout>
