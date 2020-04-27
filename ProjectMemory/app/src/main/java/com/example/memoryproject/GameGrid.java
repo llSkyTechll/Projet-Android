@@ -5,7 +5,10 @@ import androidx.gridlayout.widget.GridLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class GameGrid extends AppCompatActivity {
 
@@ -13,6 +16,7 @@ public class GameGrid extends AppCompatActivity {
     int gridSize;
     GridLayout gridLayout;
     ImageView imgView;
+    Button test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +36,11 @@ public class GameGrid extends AppCompatActivity {
 
     private void createImages(){
         for (int i = 0; i < gridSize; i++){
-            imgView = new ImageView(this);
-            gridLayout.addView(imgView);
+            //imgView = new ImageView(this);
+            test = new Button(this);
+            test.setId(i);
+            test.setText("test");
+            gridLayout.addView(test);
         }
     }
 }
