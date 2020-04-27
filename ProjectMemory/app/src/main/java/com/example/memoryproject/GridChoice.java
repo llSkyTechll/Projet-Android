@@ -32,21 +32,21 @@ public class GridChoice extends AppCompatActivity {
         btn_2x2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adjustGridChoice(2, 2);
+                adjustGridChoice(2, 4);
             }
         });
 
         btn_4x4.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                adjustGridChoice(8, 4);
+                adjustGridChoice(8, 16);
             }
         });
 
         btn_6x6.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                adjustGridChoice(18, 6);
+                adjustGridChoice(18, 36);
             }
         });
     }

@@ -9,4 +9,7 @@
     <string name="btn_4x4">4 x 4</string>
     <string name="btn_6x6">6 x 6</string>
     <string name="textView_pickAGrid">Choisissez les dimensions de la grille</string>
+
+    <!-- Picture Choice -->
+    <string name="btn_goToGame">START</string>
 </resources>

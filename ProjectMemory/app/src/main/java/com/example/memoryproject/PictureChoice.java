@@ -3,7 +3,6 @@ package com.example.memoryproject;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.ClipData;
@@ -24,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PictureChoice extends AppCompatActivity {
+
     Button btnPickImage;
+    Button btnStartGame;
     ImageView imageView;
     List<Bitmap> bitmaps;
     ClipData clipData;
@@ -32,17 +33,18 @@ public class PictureChoice extends AppCompatActivity {
     InputStream inputStream;
     Intent intent;
     int picturesRequired;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture_choice);
         btnPickImage = findViewById(R.id.btn_pickImage);
+        btnStartGame = findViewById(R.id.btn_goToGame);
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
         bitmaps = new ArrayList<>();
 
         setListener();
-
     }
     private void setListener(){
         btnPickImage.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +54,19 @@ public class PictureChoice extends AppCompatActivity {
                 intentContent();
             }
         });
+
+        btnStartGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                startGame();
+            }
+        });
+    }
+
+    private void startGame(){
+        Intent startGameIntent = new Intent(this, GameGrid.class);
+        startGameIntent.putExtra("gridSize", intent.getIntExtra("gridSize", 4));
+        startActivity(startGameIntent);
     }
 
     private void permission(){
