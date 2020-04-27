@@ -15,6 +15,7 @@ public class GridChoice extends AppCompatActivity {
     Button btn_4x4;
     Button btn_6x6;
     int picturesRequired = 0;
+    int gridSize = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,31 +32,35 @@ public class GridChoice extends AppCompatActivity {
         btn_2x2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                picturesRequired = 2;
-                relocatePictureChoice();
+                adjustGridChoice(2, 2);
             }
         });
 
         btn_4x4.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                picturesRequired = 8;
-                relocatePictureChoice();
+                adjustGridChoice(8, 4);
             }
         });
 
         btn_6x6.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                picturesRequired = 18;
-                relocatePictureChoice();
+                adjustGridChoice(18, 6);
             }
         });
+    }
+
+    private void adjustGridChoice(int inPicturesRequired, int inGridSize){
+        picturesRequired = inPicturesRequired;
+        gridSize         = inGridSize;
+        relocatePictureChoice();
     }
 
     private void relocatePictureChoice(){
         Intent pictureChoiceIntent = new Intent(this, PictureChoice.class);
         pictureChoiceIntent.putExtra("picturesRequired", picturesRequired);
+        pictureChoiceIntent.putExtra("gridSize", gridSize);
         startActivity(pictureChoiceIntent);
     }
 
