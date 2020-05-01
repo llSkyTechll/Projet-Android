@@ -99,7 +99,7 @@ public class PictureChoice extends AppCompatActivity {
     }
 
     private void openCamera() {
-        ContentValues values =new ContentValues();
+        ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE,"New Picture");
         values.put(MediaStore.Images.Media.DESCRIPTION,"From the camera");
         imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
@@ -160,7 +160,13 @@ public class PictureChoice extends AppCompatActivity {
     }
     private void setImage(int resultCode){
         if (resultCode == RESULT_OK){
-            imageView.setImageURI(imageUri);
+            try {
+                inputStream = getContentResolver().openInputStream(imageUri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                bitmaps.add(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -172,14 +178,14 @@ public class PictureChoice extends AppCompatActivity {
                     if ( clipData.getItemCount() <= picturesRequired){
                         imageUri = clipData.getItemAt(i).getUri();
                         picturesRequired--;
-                    try {
-                        inputStream = getContentResolver().openInputStream(imageUri);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        bitmaps.add(bitmap);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                        try {
+                            inputStream = getContentResolver().openInputStream(imageUri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            bitmaps.add(bitmap);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
                 }
 
             }else {
