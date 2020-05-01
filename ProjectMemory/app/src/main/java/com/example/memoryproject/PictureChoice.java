@@ -154,8 +154,6 @@ public class PictureChoice extends AppCompatActivity {
             case PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     openCamera();
-                } else {
-                    showMessage("Permission denied...");
                 }
         }
     }
@@ -167,74 +165,37 @@ public class PictureChoice extends AppCompatActivity {
             setImage(resultCode);
         } else {
             getImages(requestCode, resultCode, data);
-            imageThread();
         }
     }
     private void setImage(int resultCode){
         if (resultCode == RESULT_OK){
-            try {
-                inputStream = getContentResolver().openInputStream(imageUri);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                uriList.add(imageUri.toString());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            uriList.add(imageUri.toString());
+            picturesRequired--;
         }
     }
 
     private void getImages(int requestCode, int resultCode, @Nullable Intent data){
         if (requestCode == 1 && resultCode == RESULT_OK){
             clipData = data.getClipData();
-            if (clipData !=null){
+            if (clipData != null){
                 for (int i = 0; i < clipData.getItemCount();i++){
                     if ( clipData.getItemCount() <= picturesRequired){
                         imageUri = clipData.getItemAt(i).getUri();
-                        picturesRequired--;
-                        try {
-                            inputStream = getContentResolver().openInputStream(imageUri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            uriList.add(imageUri.toString());
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        addImageIfNotAlreadyInList();
                     }
                 }
-
             }else {
                 imageUri = data.getData();
-                try {
-                    inputStream =getContentResolver().openInputStream(imageUri);
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    uriList.add(imageUri.toString());
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                addImageIfNotAlreadyInList();
             }
         }
     }
 
-    private void imageThread(){
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (final Bitmap b :bitmaps) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            imageView.setImageBitmap(b);
-                        }
-                    });
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();*/
+    private void addImageIfNotAlreadyInList(){
+        if (!uriList.contains(imageUri.toString())){
+            uriList.add(imageUri.toString());
+            picturesRequired--;
+        }
     }
 
-    private void showMessage(String message){
-        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
-    }
 }
