@@ -7,15 +7,19 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,7 +36,7 @@ public class PictureChoice extends AppCompatActivity {
     Button btnStartGame;
     Button btnCapture;
     ImageView imageView;
-    List<Bitmap> bitmaps;
+    ArrayList<String> uriList;
     ClipData clipData;
     Uri imageUri;
     private static final int PERMISSION_CODE =1000;
@@ -52,7 +56,7 @@ public class PictureChoice extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
-        bitmaps = new ArrayList<>();
+        uriList = new ArrayList<>();
 
         setListener();
     }
@@ -115,6 +119,14 @@ public class PictureChoice extends AppCompatActivity {
     private void startGame(){
         Intent startGameIntent = new Intent(this, GameGrid.class);
         startGameIntent.putExtra("gridSize", intent.getIntExtra("gridSize", 4));
+
+        for (int i = picturesRequired; i > 0; i--){
+            Resources resources = this.getResources();
+            final int resourceId = resources.getIdentifier("tile" + i, "drawable", this.getPackageName());
+            Uri imageUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(resourceId) + '/' + resources.getResourceTypeName(resourceId) + '/' + resources.getResourceEntryName(resourceId) );
+            uriList.add(imageUri.toString());
+        }
+        startGameIntent.putExtra("pictures", uriList);
         startActivity(startGameIntent);
     }
 
@@ -163,7 +175,7 @@ public class PictureChoice extends AppCompatActivity {
             try {
                 inputStream = getContentResolver().openInputStream(imageUri);
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                bitmaps.add(bitmap);
+                uriList.add(imageUri.toString());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -181,7 +193,7 @@ public class PictureChoice extends AppCompatActivity {
                         try {
                             inputStream = getContentResolver().openInputStream(imageUri);
                             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            bitmaps.add(bitmap);
+                            uriList.add(imageUri.toString());
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -193,7 +205,7 @@ public class PictureChoice extends AppCompatActivity {
                 try {
                     inputStream =getContentResolver().openInputStream(imageUri);
                     Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    bitmaps.add(bitmap);
+                    uriList.add(imageUri.toString());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -202,7 +214,7 @@ public class PictureChoice extends AppCompatActivity {
     }
 
     private void imageThread(){
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 for (final Bitmap b :bitmaps) {
@@ -219,7 +231,7 @@ public class PictureChoice extends AppCompatActivity {
                     }
                 }
             }
-        }).start();
+        }).start();*/
     }
 
     private void showMessage(String message){

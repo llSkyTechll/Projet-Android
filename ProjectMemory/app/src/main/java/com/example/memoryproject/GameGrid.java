@@ -4,11 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameGrid extends AppCompatActivity {
 
@@ -17,6 +21,7 @@ public class GameGrid extends AppCompatActivity {
     GridLayout gridLayout;
     ImageView imgView;
     Button test;
+    ArrayList<String> uriList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,7 @@ public class GameGrid extends AppCompatActivity {
 
         intent = getIntent();
         gridSize = intent.getIntExtra("gridSize", 4);
+        uriList  = intent.getStringArrayListExtra("pictures");
         gridLayout = findViewById(R.id.gridLayoutGame);
         createImages();
         resizeGrid();
