@@ -5,6 +5,7 @@ import androidx.gridlayout.widget.GridLayout;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -72,16 +73,22 @@ public class GameGrid extends AppCompatActivity {
     private void addImageViews() {
         int uriId = 0;
         for (Uri uri: uriList ) {
-            imgView = new ImageView(this);
-            imgView.setId(uriId);
-            imgView.setImageURI(uri);
-            imgView.setMaxWidth(screenWidth / gridLayout.getColumnCount());
-            imgView.setMaxHeight(imgView.getMaxWidth());
-            imgView.setAdjustViewBounds(true);
-            imgView.invalidate();
-            gridLayout.addView(imgView);
+            configureImageView(uri, uriId);
             uriId++;
         }
+    }
+
+    private void configureImageView(Uri uri, int uriId){
+        imgView = new ImageView(this);
+        imgView.setId(uriId);
+        imgView.setImageURI(uri);
+        imgView.setMaxWidth(screenWidth / gridLayout.getColumnCount());
+        imgView.setMaxHeight(imgView.getMaxWidth());
+        imgView.setAdjustViewBounds(true);
+        imgView.setPadding(1,1,1,1);
+        imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imgView.invalidate();
+        gridLayout.addView(imgView);
     }
 
     private void duplicateImages(){

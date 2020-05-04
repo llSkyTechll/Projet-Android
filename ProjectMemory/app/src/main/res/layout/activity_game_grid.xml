@@ -8,8 +8,8 @@
 
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/gridLayoutGame"
-        android:layout_width="409dp"
-        android:layout_height="729dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="64dp"
         android:layout_marginBottom="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
