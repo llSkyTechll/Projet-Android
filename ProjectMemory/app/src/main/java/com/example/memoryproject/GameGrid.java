@@ -1,15 +1,20 @@
 package com.example.memoryproject;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,6 +34,7 @@ public class GameGrid extends AppCompatActivity {
     ArrayList<Uri> uriList;
     int screenWidth;
     int screenHeight;
+    int imageRevealed = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,7 @@ public class GameGrid extends AppCompatActivity {
 
     private void resizeGrid(){
         gridLayout.setColumnCount((int) Math.sqrt(gridSize));
+        gridLayout.setBackgroundColor(Color.RED);
     }
 
     private void createImages(){
@@ -86,9 +93,27 @@ public class GameGrid extends AppCompatActivity {
         imgView.setMaxHeight(imgView.getMaxWidth());
         imgView.setAdjustViewBounds(true);
         imgView.setPadding(1,1,1,1);
-        imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imgView.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           ImageView imageView = v.findViewById(v.getId());
+
+                                           imageView.setImageURI(uriList.get(imageView.getId()));
+                                           imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                           if (getImageRevealed() >= 2){
+
+                                           }
+                                           else{
+
+                                           }
+                                       }
+                                   });
         imgView.invalidate();
         gridLayout.addView(imgView);
+    }
+
+    private int getImageRevealed(){
+        return imageRevealed++;
     }
 
     private void duplicateImages(){
