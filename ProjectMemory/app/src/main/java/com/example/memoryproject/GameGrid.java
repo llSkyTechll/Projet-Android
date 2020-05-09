@@ -11,10 +11,13 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.CalendarContract;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -30,11 +33,14 @@ public class GameGrid extends AppCompatActivity {
     int gridSize;
     GridLayout gridLayout;
     ImageView imgView;
+    ImageView imgViewBack;
     ArrayList<String> uriStringList;
     ArrayList<Uri> uriList;
     int screenWidth;
     int screenHeight;
     int imageRevealed = 0;
+    Animation animFadeOut;
+    Animation animFadeIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +52,28 @@ public class GameGrid extends AppCompatActivity {
         uriStringList  = intent.getStringArrayListExtra("pictures");
         uriList        = new ArrayList<Uri>();
         gridLayout     = findViewById(R.id.gridLayoutGame);
+        animFadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out);
+        animFadeIn  = AnimationUtils.loadAnimation(this,R.anim.fade_in);
         restartGrid();
         detectScreenSize();
         createImages();
         resizeGrid();
         duplicateImages();
         addImageViews();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                makeImagesInvisible();
+            }
+        }, 5000);
+    }
+
+    private void makeImagesInvisible(){
+        for (int x = 0; x < uriList.size(); x++){
+            imgViewBack = findViewById(x);
+            imgViewBack.setImageAlpha(0);
+        }
     }
 
     private void restartGrid() {
@@ -97,9 +119,9 @@ public class GameGrid extends AppCompatActivity {
                                        @Override
                                        public void onClick(View v) {
                                            ImageView imageView = v.findViewById(v.getId());
-
-                                           imageView.setImageURI(uriList.get(imageView.getId()));
-                                           imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                           //imageView.setImageAlpha(255);
+                                           Log.d("test", "onClick: TEST");
+                                           imgView.startAnimation(animFadeIn);
                                            if (getImageRevealed() >= 2){
 
                                            }
