@@ -48,6 +48,7 @@ public class GameGrid extends AppCompatActivity {
     Bitmap firstBitmap;
     Bitmap secondBitmap;
     MediaPlayer confirmationSound;
+    Boolean canSelect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class GameGrid extends AppCompatActivity {
         animFadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
         animFadeIn  = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         confirmationSound = MediaPlayer.create(this, R.raw.confirmationsound);
+        canSelect = true;
         restartGrid();
         detectScreenSize();
         createImages();
@@ -84,17 +86,20 @@ public class GameGrid extends AppCompatActivity {
             imgView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ImageView imageView = v.findViewById(v.getId());
-                    imageView.setImageAlpha(255);
-                    //imgView.startAnimation(animFadeIn);
-                    if (imageRevealed == 1){
-                        secondImageRevealed = imageView;
-                        compareImages();
-                        imageRevealed = 0;
-
-                    }else{
-                        firstImageRevealed = imageView;
-                        imageRevealed++;
+                    if (canSelect){
+                        ImageView imageView = v.findViewById(v.getId());
+                        imageView.setImageAlpha(255);
+                        //imgView.startAnimation(animFadeIn);
+                        if (imageRevealed == 1){
+                            if (firstImageRevealed.getId() != imageView.getId()){
+                                secondImageRevealed = imageView;
+                                compareImages();
+                                imageRevealed = 0;
+                            }
+                        }else{
+                            firstImageRevealed = imageView;
+                            imageRevealed++;
+                        }
                     }
                 }
             });
@@ -102,6 +107,7 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void compareImages(){
+        canSelect = false;
         firstBitmap  = ((BitmapDrawable)firstImageRevealed.getDrawable()).getBitmap();
         secondBitmap = ((BitmapDrawable)secondImageRevealed.getDrawable()).getBitmap();
         if (firstBitmap == secondBitmap){
@@ -111,6 +117,7 @@ public class GameGrid extends AppCompatActivity {
                 public void run() {
                     firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
                     secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
+                    canSelect = true;
                 }
             }, 500);
         }else{
@@ -119,6 +126,7 @@ public class GameGrid extends AppCompatActivity {
                 public void run() {
                     firstImageRevealed.setImageAlpha(0);
                     secondImageRevealed.setImageAlpha(0);
+                    canSelect = true;
                 }
             }, 500);
         }
@@ -132,7 +140,7 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void restartGrid() {
-           gridLayout.removeAllViews();
+        gridLayout.removeAllViews();
     }
 
     private void detectScreenSize(){
