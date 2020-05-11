@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,6 +43,11 @@ public class GameGrid extends AppCompatActivity {
     int imageRevealed = 0;
     Animation animFadeOut;
     Animation animFadeIn;
+    ImageView firstImageRevealed;
+    ImageView secondImageRevealed;
+    Bitmap firstBitmap;
+    Bitmap secondBitmap;
+    MediaPlayer confirmationSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +59,9 @@ public class GameGrid extends AppCompatActivity {
         uriStringList  = intent.getStringArrayListExtra("pictures");
         uriList        = new ArrayList<Uri>();
         gridLayout     = findViewById(R.id.gridLayoutGame);
-        animFadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out);
-        animFadeIn  = AnimationUtils.loadAnimation(this,R.anim.fade_in);
+        animFadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+        animFadeIn  = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        confirmationSound = MediaPlayer.create(this, R.raw.confirmationsound);
         restartGrid();
         detectScreenSize();
         createImages();
@@ -65,8 +73,55 @@ public class GameGrid extends AppCompatActivity {
             @Override
             public void run() {
                 makeImagesInvisible();
+                setImageViewsListeners();
             }
         }, 5000);
+    }
+
+    private void setImageViewsListeners(){
+        for (int i = 0; i < uriList.size(); i++){
+            imgView = findViewById(i);
+            imgView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ImageView imageView = v.findViewById(v.getId());
+                    imageView.setImageAlpha(255);
+                    //imgView.startAnimation(animFadeIn);
+                    if (imageRevealed == 1){
+                        secondImageRevealed = imageView;
+                        compareImages();
+                        imageRevealed = 0;
+
+                    }else{
+                        firstImageRevealed = imageView;
+                        imageRevealed++;
+                    }
+                }
+            });
+        }
+    }
+
+    private void compareImages(){
+        firstBitmap  = ((BitmapDrawable)firstImageRevealed.getDrawable()).getBitmap();
+        secondBitmap = ((BitmapDrawable)secondImageRevealed.getDrawable()).getBitmap();
+        if (firstBitmap == secondBitmap){
+            confirmationSound.start();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
+                    secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
+                }
+            }, 500);
+        }else{
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    firstImageRevealed.setImageAlpha(0);
+                    secondImageRevealed.setImageAlpha(0);
+                }
+            }, 500);
+        }
     }
 
     private void makeImagesInvisible(){
@@ -113,29 +168,11 @@ public class GameGrid extends AppCompatActivity {
         imgView.setImageURI(uri);
         imgView.setMaxWidth(screenWidth / gridLayout.getColumnCount());
         imgView.setMaxHeight(imgView.getMaxWidth());
+        imgView.setScaleType(ImageView.ScaleType.FIT_XY);
         imgView.setAdjustViewBounds(true);
         imgView.setPadding(1,1,1,1);
-        imgView.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View v) {
-                                           ImageView imageView = v.findViewById(v.getId());
-                                           //imageView.setImageAlpha(255);
-                                           Log.d("test", "onClick: TEST");
-                                           imgView.startAnimation(animFadeIn);
-                                           if (getImageRevealed() >= 2){
-
-                                           }
-                                           else{
-
-                                           }
-                                       }
-                                   });
         imgView.invalidate();
         gridLayout.addView(imgView);
-    }
-
-    private int getImageRevealed(){
-        return imageRevealed++;
     }
 
     private void duplicateImages(){
