@@ -198,4 +198,9 @@ public class PictureChoice extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        uriList.clear();
+    }
 }

@@ -4,6 +4,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -18,6 +20,7 @@ import android.provider.CalendarContract;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -48,6 +51,8 @@ public class GameGrid extends AppCompatActivity {
     Bitmap firstBitmap;
     Bitmap secondBitmap;
     MediaPlayer confirmationSound;
+    AlphaAnimation animationFadeIn;
+    AlphaAnimation animationFadeOut;
     Boolean canSelect;
 
     @Override
@@ -60,11 +65,9 @@ public class GameGrid extends AppCompatActivity {
         uriStringList  = intent.getStringArrayListExtra("pictures");
         uriList        = new ArrayList<Uri>();
         gridLayout     = findViewById(R.id.gridLayoutGame);
-        animFadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
-        animFadeIn  = AnimationUtils.loadAnimation(this, R.anim.fade_in);
         confirmationSound = MediaPlayer.create(this, R.raw.confirmationsound);
+        createAnimations();
         canSelect = true;
-        restartGrid();
         detectScreenSize();
         createImages();
         resizeGrid();
@@ -80,6 +83,15 @@ public class GameGrid extends AppCompatActivity {
         }, 5000);
     }
 
+    private void createAnimations(){
+        animationFadeIn = new AlphaAnimation(0f, 1.0f);
+        animationFadeIn.setDuration(1500);
+        animationFadeIn.setFillAfter(true);
+        animationFadeOut = new AlphaAnimation(1f, 0f);
+        animationFadeOut.setDuration(1000);
+        animationFadeOut.setFillAfter(true);
+    }
+
     private void setImageViewsListeners(){
         for (int i = 0; i < uriList.size(); i++){
             imgView = findViewById(i);
@@ -88,8 +100,9 @@ public class GameGrid extends AppCompatActivity {
                 public void onClick(View v) {
                     if (canSelect){
                         ImageView imageView = v.findViewById(v.getId());
-                        imageView.setImageAlpha(255);
-                        //imgView.startAnimation(animFadeIn);
+
+                        imageView.startAnimation(animationFadeIn);
+
                         if (imageRevealed == 1){
                             if (firstImageRevealed.getId() != imageView.getId()){
                                 secondImageRevealed = imageView;
@@ -106,41 +119,59 @@ public class GameGrid extends AppCompatActivity {
         }
     }
 
-    private void compareImages(){
+    private void compareImages() {
         canSelect = false;
-        firstBitmap  = ((BitmapDrawable)firstImageRevealed.getDrawable()).getBitmap();
-        secondBitmap = ((BitmapDrawable)secondImageRevealed.getDrawable()).getBitmap();
-        if (firstBitmap == secondBitmap){
-            confirmationSound.start();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
-                    secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
-                    canSelect = true;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                firstBitmap  = ((BitmapDrawable)firstImageRevealed.getDrawable()).getBitmap();
+                secondBitmap = ((BitmapDrawable)secondImageRevealed.getDrawable()).getBitmap();
+                if (firstBitmap == secondBitmap){
+                    playSound();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            removeValidPair();
+                        }
+                    }, 500);
+                }else{
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideWrongAnswer();
+                        }
+                    }, 500);
                 }
-            }, 500);
-        }else{
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    firstImageRevealed.setImageAlpha(0);
-                    secondImageRevealed.setImageAlpha(0);
-                    canSelect = true;
-                }
-            }, 500);
+            }
+        }, 1500);
+    }
+
+    private void removeValidPair(){
+        firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
+        firstImageRevealed.setOnClickListener(null);
+        secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
+        secondImageRevealed.setOnClickListener(null);
+        canSelect = true;
+    }
+
+    private void hideWrongAnswer(){
+        firstImageRevealed.startAnimation(animationFadeOut);
+        secondImageRevealed.startAnimation(animationFadeOut);
+        canSelect = true;
+    }
+
+    private void playSound(){
+        if (confirmationSound.isPlaying()){
+            confirmationSound.seekTo(0);
         }
+        confirmationSound.start();
     }
 
     private void makeImagesInvisible(){
         for (int x = 0; x < uriList.size(); x++){
             imgViewBack = findViewById(x);
-            imgViewBack.setImageAlpha(0);
+            imgViewBack.startAnimation(animationFadeOut);
         }
-    }
-
-    private void restartGrid() {
-        gridLayout.removeAllViews();
     }
 
     private void detectScreenSize(){
@@ -176,11 +207,14 @@ public class GameGrid extends AppCompatActivity {
         imgView.setImageURI(uri);
         imgView.setMaxWidth(screenWidth / gridLayout.getColumnCount());
         imgView.setMaxHeight(imgView.getMaxWidth());
-        imgView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imgView.setAdjustViewBounds(true);
-        imgView.setPadding(1,1,1,1);
-        imgView.invalidate();
         gridLayout.addView(imgView);
+        imgView.setScaleType(ImageView.ScaleType.FIT_XY);
+        imgView.setPadding(1,1,1,1);
+        imgView.getLayoutParams().height = imgView.getMaxWidth();
+        imgView.getLayoutParams().width  = imgView.getMaxWidth();
+        imgView.invalidate();
+
+        imgView.requestLayout();
     }
 
     private void duplicateImages(){
