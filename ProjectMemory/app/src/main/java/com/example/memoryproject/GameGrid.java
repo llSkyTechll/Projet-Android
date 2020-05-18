@@ -1,5 +1,6 @@
 package com.example.memoryproject;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
@@ -28,12 +29,14 @@ public class GameGrid extends AppCompatActivity {
     ArrayList<Uri> uriList;
     int screenWidth;
     int screenHeight;
+    private GameGrid activity;
+    private GamePoints points;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_grid);
-
+        this.activity = this;
         intent         = getIntent();
         gridSize       = intent.getIntExtra("gridSize", 4);
         uriStringList  = intent.getStringArrayListExtra("pictures");
@@ -95,5 +98,11 @@ public class GameGrid extends AppCompatActivity {
     private void shuffleImageList(){
         Collections.shuffle(uriList);
     }
-    
+
+    private void popupCreator(String title, String message){
+        AlertDialog.Builder myPopup = new AlertDialog.Builder(activity);
+        myPopup.setTitle(title);
+        myPopup.setMessage(message);
+        myPopup.show();
+    }
 }
