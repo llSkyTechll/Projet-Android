@@ -51,7 +51,6 @@ public class GameGrid extends AppCompatActivity {
     Bitmap firstBitmap;
     Bitmap secondBitmap;
     MediaPlayer confirmationSound;
-    AlphaAnimation animationFadeIn;
     AlphaAnimation animationFadeOut;
     Boolean canSelect;
 
@@ -84,9 +83,6 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void createAnimations(){
-        animationFadeIn = new AlphaAnimation(0f, 1.0f);
-        animationFadeIn.setDuration(1500);
-        animationFadeIn.setFillAfter(true);
         animationFadeOut = new AlphaAnimation(1f, 0f);
         animationFadeOut.setDuration(1000);
         animationFadeOut.setFillAfter(true);
@@ -101,7 +97,10 @@ public class GameGrid extends AppCompatActivity {
                     if (canSelect){
                         ImageView imageView = v.findViewById(v.getId());
 
-                        imageView.startAnimation(animationFadeIn);
+                        Animation animation = new AlphaAnimation(0f, 1f);
+                        animation.setDuration(1500);
+                        animation.setFillAfter(true);
+                        imageView.startAnimation(animation);
 
                         if (imageRevealed == 1){
                             if (firstImageRevealed.getId() != imageView.getId()){
@@ -149,14 +148,19 @@ public class GameGrid extends AppCompatActivity {
     private void removeValidPair(){
         firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         firstImageRevealed.setOnClickListener(null);
+        firstImageRevealed.setAnimation(null);
         secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         secondImageRevealed.setOnClickListener(null);
+        secondImageRevealed.setAnimation(null);
         canSelect = true;
     }
 
     private void hideWrongAnswer(){
-        firstImageRevealed.startAnimation(animationFadeOut);
-        secondImageRevealed.startAnimation(animationFadeOut);
+        Animation animation = new AlphaAnimation(1f, 0f);
+        animation.setDuration(1000);
+        animation.setFillAfter(true);
+        firstImageRevealed.startAnimation(animation);
+        secondImageRevealed.startAnimation(animation);
         canSelect = true;
     }
 
