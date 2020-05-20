@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.memoryproject.Notification.NotificationService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,7 @@ public class GameGrid extends AppCompatActivity {
     int screenHeight;
     private GameGrid activity;
     private GamePoints points;
+    private NotificationService notificationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class GameGrid extends AppCompatActivity {
         setContentView(R.layout.activity_game_grid);
         this.activity = this;
         points = new GamePoints();
+        notificationService = new NotificationService();
         points.setPoints(0);
         intent         = getIntent();
         gridSize       = intent.getIntExtra("gridSize", 4);
@@ -51,7 +55,11 @@ public class GameGrid extends AppCompatActivity {
         duplicateImages();
         addImageViews();
     }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+    }
     private void restartGrid() {
            gridLayout.removeAllViews();
     }
