@@ -37,6 +37,8 @@ public class GameGrid extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_grid);
         this.activity = this;
+        points = new GamePoints();
+        points.setPoints(0);
         intent         = getIntent();
         gridSize       = intent.getIntExtra("gridSize", 4);
         uriStringList  = intent.getStringArrayListExtra("pictures");

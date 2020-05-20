@@ -16,10 +16,10 @@ public class GamePoints {
     }
 
     public void subtractPoints(){
-        if (points >= 0) {
-            points = points - 5;
-        } else if (points <= 0) {
+        if (points <= 0) {
             points = 0;
+        } else if (points >= 0) {
+            points = points - 5;
         }
     }
 }
