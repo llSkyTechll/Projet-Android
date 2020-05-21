@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -34,7 +35,6 @@ public class GameGrid extends AppCompatActivity {
     ImageView imgView;
     ImageView imgViewBack;
     ArrayList<String> uriStringList;
-    ArrayList<Uri> uriList;
     int screenWidth;
     int screenHeight;
     private GameGrid activity;
@@ -42,14 +42,14 @@ public class GameGrid extends AppCompatActivity {
     int imageRevealed = 0;
     ImageView firstImageRevealed;
     ImageView secondImageRevealed;
-    Bitmap firstBitmap;
-    Bitmap secondBitmap;
     MediaPlayer confirmationSound;
     AlphaAnimation animationFadeOut;
     Boolean canSelect;
     int pairsToFind;
     TextView txtPoints;
     Boolean isChoice;
+    int firstImageRevealedId;
+    int secondImageRevealedId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +63,12 @@ public class GameGrid extends AppCompatActivity {
         gridSize       = intent.getIntExtra("gridSize", 4);
         pairsToFind    = gridSize / 2;
         uriStringList  = intent.getStringArrayListExtra("pictures");
-        uriList        = new ArrayList<Uri>();
         gridLayout     = findViewById(R.id.gridLayoutGame);
         confirmationSound = MediaPlayer.create(this, R.raw.confirmationsound);
         txtPoints      = findViewById(R.id.textView_points);
         createAnimations();
         canSelect = true;
         detectScreenSize();
-        createImages();
         resizeGrid();
         duplicateImages();
         addImageViews();
@@ -93,7 +91,7 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void setImageViewsListeners(){
-        for (int i = 0; i < uriList.size(); i++){
+        for (int i = 0; i < uriStringList.size(); i++){
             imgView = findViewById(i);
             imgView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -107,13 +105,13 @@ public class GameGrid extends AppCompatActivity {
                         imageView.startAnimation(animation);
 
                         if (imageRevealed == 1){
-                            if (firstImageRevealed.getId() != imageView.getId()){
-                                secondImageRevealed = imageView;
+                            if (firstImageRevealedId != imageView.getId()){
+                                secondImageRevealedId = v.getId();
                                 compareImages();
                                 imageRevealed = 0;
                             }
                         }else{
-                            firstImageRevealed = imageView;
+                            firstImageRevealedId = v.getId();
                             imageRevealed++;
                         }
                     }
@@ -127,9 +125,7 @@ public class GameGrid extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                firstBitmap  = ((BitmapDrawable)firstImageRevealed.getDrawable()).getBitmap();
-                secondBitmap = ((BitmapDrawable)secondImageRevealed.getDrawable()).getBitmap();
-                if (firstBitmap == secondBitmap){
+                if (uriStringList.get(firstImageRevealedId) == uriStringList.get(secondImageRevealedId)){
                     playSound();
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -152,9 +148,11 @@ public class GameGrid extends AppCompatActivity {
     private void removeValidPair(){
         points.AddPoints();
         changePoints();
+        firstImageRevealed = findViewById(firstImageRevealedId);
         firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         firstImageRevealed.setOnClickListener(null);
         firstImageRevealed.setAnimation(null);
+        secondImageRevealed = findViewById(secondImageRevealedId);
         secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         secondImageRevealed.setOnClickListener(null);
         secondImageRevealed.setAnimation(null);
@@ -175,7 +173,9 @@ public class GameGrid extends AppCompatActivity {
         Animation animation = new AlphaAnimation(1f, 0f);
         animation.setDuration(1000);
         animation.setFillAfter(true);
+        firstImageRevealed = findViewById(firstImageRevealedId);
         firstImageRevealed.startAnimation(animation);
+        secondImageRevealed = findViewById(secondImageRevealedId);
         secondImageRevealed.startAnimation(animation);
         canSelect = true;
     }
@@ -188,7 +188,7 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void makeImagesInvisible(){
-        for (int x = 0; x < uriList.size(); x++){
+        for (int x = 0; x < uriStringList.size(); x++){
             imgViewBack = findViewById(x);
             imgViewBack.startAnimation(animationFadeOut);
         }
@@ -206,16 +206,10 @@ public class GameGrid extends AppCompatActivity {
         gridLayout.setBackgroundColor(Color.RED);
     }
 
-    private void createImages(){
-        for (String stringFile: uriStringList) {
-            Uri uri = Uri.parse(stringFile);
-            uriList.add(uri);
-        }
-    }
-    
     private void addImageViews() {
         int uriId = 0;
-        for (Uri uri: uriList ) {
+        for (String stringFile: uriStringList ) {
+            Uri uri = Uri.parse(stringFile);
             configureImageView(uri, uriId);
             uriId++;
         }
@@ -238,15 +232,16 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void duplicateImages(){
-        int uriListSize = uriList.size();
+        int uriListSize = uriStringList.size();
         for (int i = 0; i < uriListSize; i++){
-            uriList.add(uriList.get(i));
+            uriStringList.add(uriStringList.get(i));
         }
+
         shuffleImageList();
     }
 
     private void shuffleImageList(){
-        Collections.shuffle(uriList);
+        Collections.shuffle(uriStringList);
     }
 
     private void popupCreator(String title, String message){

@@ -171,9 +171,11 @@ public class PictureChoice extends AppCompatActivity {
     }
     private void setImage(int resultCode){
         if (resultCode == RESULT_OK){
-            uriList.add(imageUri.toString());
-            picturesRequired--;
-            showMessage("Il manque " + picturesRequired + " images");
+            if (picturesRequired > 0) {
+                uriList.add(imageUri.toString());
+                picturesRequired--;
+                showMessage("Il manque " + picturesRequired + " images");
+            }
         }
     }
 
@@ -181,17 +183,20 @@ public class PictureChoice extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK){
             clipData = data.getClipData();
             if (clipData != null){
-                for (int i = 0; i < clipData.getItemCount();i++){
-                    if ( clipData.getItemCount() <= picturesRequired){
+                int currentPicturesRequired = picturesRequired;
+                for (int i = 0; i < clipData.getItemCount(); i++){
+                    if ( i < currentPicturesRequired){
                         imageUri = clipData.getItemAt(i).getUri();
                         addImageIfNotAlreadyInList();
-                        showMessage("Il manque " + picturesRequired + " images");
                     }
                 }
-            }else {
-                imageUri = data.getData();
-                addImageIfNotAlreadyInList();
                 showMessage("Il manque " + picturesRequired + " images");
+            }else {
+                if (picturesRequired > 0) {
+                    imageUri = data.getData();
+                    addImageIfNotAlreadyInList();
+                    showMessage("Il manque " + picturesRequired + " images");
+                }
             }
         }
     }
