@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.content.ClipData;
@@ -12,24 +14,17 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.memoryproject.Notification.NotificationService;
+import com.example.memoryproject.Notification.NotifWorker;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PictureChoice extends AppCompatActivity {
 
@@ -41,12 +36,10 @@ public class PictureChoice extends AppCompatActivity {
     Uri imageUri;
     private static final int PERMISSION_CODE =1000;
     private static final int IMAGE_CAPTURE_CODE = 1001;
-    InputStream inputStream;
     Intent intent;
     int picturesRequired;
     boolean isCaptured = false;
     boolean onResume = false;
-    private NotificationService notificationService;
     Boolean isChoice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +48,6 @@ public class PictureChoice extends AppCompatActivity {
         btnPickImage = findViewById(R.id.btn_pickImage);
         btnStartGame = findViewById(R.id.btn_goToGame);
         btnCapture =findViewById(R.id.btn_takeImage);
-        notificationService = new NotificationService();
         isChoice = false;
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
@@ -63,14 +55,9 @@ public class PictureChoice extends AppCompatActivity {
 
         setListener();
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!isChoice){
-            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
-        }
-        isChoice = false;
-    }
+
+
+
     private void setListener(){
         btnPickImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +128,6 @@ public class PictureChoice extends AppCompatActivity {
             uriList.add(imageUri.toString());
         }
         startGameIntent.putExtra("pictures", uriList);
-        Log.d("test", "startGame: " + uriList.size());
         onResume = true;
         startActivity(startGameIntent);
     }
@@ -225,6 +211,23 @@ public class PictureChoice extends AppCompatActivity {
             picturesRequired = intent.getIntExtra("picturesRequired",2);
         }
         onResume = false;
+        isChoice = false;
+    }
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        isChoice = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!isChoice){
+            OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(NotifWorker.class)
+                    .build();
+            WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+        }
     }
 
     private void showMessage(String message){

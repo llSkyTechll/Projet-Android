@@ -1,40 +1,30 @@
 package com.example.memoryproject;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.CalendarContract;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.memoryproject.Notification.NotificationService;
+import com.example.memoryproject.Notification.NotifWorker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class GameGrid extends AppCompatActivity {
 
@@ -49,10 +39,7 @@ public class GameGrid extends AppCompatActivity {
     int screenHeight;
     private GameGrid activity;
     private GamePoints points;
-    private NotificationService notificationService;
     int imageRevealed = 0;
-    Animation animFadeOut;
-    Animation animFadeIn;
     ImageView firstImageRevealed;
     ImageView secondImageRevealed;
     Bitmap firstBitmap;
@@ -62,6 +49,7 @@ public class GameGrid extends AppCompatActivity {
     Boolean canSelect;
     int pairsToFind;
     TextView txtPoints;
+    Boolean isChoice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +57,8 @@ public class GameGrid extends AppCompatActivity {
         setContentView(R.layout.activity_game_grid);
         this.activity = this;
         points = new GamePoints();
-        notificationService = new NotificationService();
         points.setPoints(0);
+        isChoice = false;
         intent         = getIntent();
         gridSize       = intent.getIntExtra("gridSize", 4);
         pairsToFind    = gridSize / 2;
@@ -96,16 +84,12 @@ public class GameGrid extends AppCompatActivity {
         }, 5000);
     }
 
+
+
     private void createAnimations(){
         animationFadeOut = new AlphaAnimation(1f, 0f);
         animationFadeOut.setDuration(1000);
         animationFadeOut.setFillAfter(true);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        notificationService.sendNotificationForMessage();
     }
 
     private void setImageViewsListeners(){
@@ -274,5 +258,27 @@ public class GameGrid extends AppCompatActivity {
 
     private void changePoints(){
         txtPoints.setText(String.valueOf(points.getPoints()));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isChoice = false;
+    }
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        isChoice = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!isChoice){
+            OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(NotifWorker.class)
+                    .build();
+            WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+        }
     }
 }

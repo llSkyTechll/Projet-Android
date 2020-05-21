@@ -1,15 +1,16 @@
 package com.example.memoryproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import android.content.Intent;
-import android.graphics.Picture;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.memoryproject.Notification.NotificationService;
+import com.example.memoryproject.Notification.NotifWorker;
 
 public class GridChoice extends AppCompatActivity {
 
@@ -18,7 +19,6 @@ public class GridChoice extends AppCompatActivity {
     Button btn_6x6;
     int picturesRequired = 0;
     int gridSize = 0;
-    private NotificationService notificationService;
     Boolean isChoice;
 
     @Override
@@ -26,26 +26,19 @@ public class GridChoice extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grid_choice);
 
-        notificationService = new NotificationService();
         isChoice = false;
         btn_2x2 = findViewById(R.id.btn_2x2);
         btn_4x4 = findViewById(R.id.btn_4x4);
         btn_6x6 = findViewById(R.id.btn_6x6);
         setListener();
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (!isChoice){
-            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
-        }
-        isChoice = false;
-    }
+
+
+
     private void setListener(){
         btn_2x2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isChoice = true;
                 adjustGridChoice(2, 4);
             }
         });
@@ -53,7 +46,6 @@ public class GridChoice extends AppCompatActivity {
         btn_4x4.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                isChoice = true;
                 adjustGridChoice(8, 16);
 
             }
@@ -62,7 +54,6 @@ public class GridChoice extends AppCompatActivity {
         btn_6x6.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                isChoice = true;
                 adjustGridChoice(18, 36);
             }
         });
@@ -75,13 +66,32 @@ public class GridChoice extends AppCompatActivity {
     }
 
     private void relocatePictureChoice(){
+        isChoice = true;
         Intent pictureChoiceIntent = new Intent(this, PictureChoice.class);
         pictureChoiceIntent.putExtra("picturesRequired", picturesRequired);
         pictureChoiceIntent.putExtra("gridSize", gridSize);
         startActivity(pictureChoiceIntent);
     }
 
-    private void showMessage(String message){
-        Toast.makeText(GridChoice.this, message, Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isChoice = false;
+    }
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        isChoice = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!isChoice){
+            OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(NotifWorker.class)
+                    .build();
+            WorkManager.getInstance(this).enqueue(uploadWorkRequest);
+        }
     }
 }

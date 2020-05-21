@@ -1,39 +1,40 @@
 package com.example.memoryproject;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.memoryproject.Notification.NotificationService;
+import com.example.memoryproject.Notification.NotifWorker;
 
 public class MainActivity extends AppCompatActivity {
 
     Button btnPlay;
-    private NotificationService notificationService;
     Boolean isPlay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         isPlay = false;
-        notificationService = new NotificationService();
         btnPlay = findViewById(R.id.btn_play);
         setListener();
     }
+
     @Override
     protected void onStop() {
         super.onStop();
         if (!isPlay){
-            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
+            OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(NotifWorker.class)
+                    .build();
+            WorkManager.getInstance(this).enqueue(uploadWorkRequest);
         }
-        isPlay = false;
     }
+
     private void setListener(){
         btnPlay.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -44,7 +45,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isPlay = false;
+    }
+
     private void relocateSelectGrid(){
+        isPlay = true;
         Intent gridChoiceIntent = new Intent(this, GridChoice.class);
         startActivity(gridChoiceIntent);
     }
