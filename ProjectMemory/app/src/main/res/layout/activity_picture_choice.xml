@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:id="@+id/linearlayout_picturechoice"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_goToGame"
@@ -12,20 +13,14 @@
 
     <Button
         android:id="@+id/btn_pickImage"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pick Image" />
+        android:text="@string/gallery" />
 
     <Button
         android:id="@+id/btn_takeImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TAKE IMAGE" />
-
-    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/btn_pickImage"
-        android:id="@+id/imageView"/>
+        android:layout_height="wrap_content"
+        android:text="@string/camera" />
 
 </LinearLayout>

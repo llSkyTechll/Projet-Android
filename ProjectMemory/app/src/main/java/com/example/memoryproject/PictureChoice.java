@@ -22,8 +22,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.memoryproject.Notification.NotificationService;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -35,7 +36,6 @@ public class PictureChoice extends AppCompatActivity {
     Button btnPickImage;
     Button btnStartGame;
     Button btnCapture;
-    ImageView imageView;
     ArrayList<String> uriList;
     ClipData clipData;
     Uri imageUri;
@@ -45,7 +45,9 @@ public class PictureChoice extends AppCompatActivity {
     Intent intent;
     int picturesRequired;
     boolean isCaptured = false;
-
+    boolean onResume = false;
+    private NotificationService notificationService;
+    Boolean isChoice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,17 +55,27 @@ public class PictureChoice extends AppCompatActivity {
         btnPickImage = findViewById(R.id.btn_pickImage);
         btnStartGame = findViewById(R.id.btn_goToGame);
         btnCapture =findViewById(R.id.btn_takeImage);
-        imageView = findViewById(R.id.imageView);
+        notificationService = new NotificationService();
+        isChoice = false;
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
         uriList = new ArrayList<>();
 
         setListener();
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!isChoice){
+            notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+        }
+        isChoice = false;
+    }
     private void setListener(){
         btnPickImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isChoice = true;
                 isCaptured = false;
                 permission();
                 intentContent();
@@ -73,6 +85,7 @@ public class PictureChoice extends AppCompatActivity {
         btnStartGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                isChoice = true;
                 startGame();
             }
         });
@@ -80,6 +93,7 @@ public class PictureChoice extends AppCompatActivity {
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isChoice = true;
                 isCaptured = true;
                 permissionCamera();
             }
@@ -127,6 +141,8 @@ public class PictureChoice extends AppCompatActivity {
             uriList.add(imageUri.toString());
         }
         startGameIntent.putExtra("pictures", uriList);
+        Log.d("test", "startGame: " + uriList.size());
+        onResume = true;
         startActivity(startGameIntent);
     }
 
@@ -171,6 +187,7 @@ public class PictureChoice extends AppCompatActivity {
         if (resultCode == RESULT_OK){
             uriList.add(imageUri.toString());
             picturesRequired--;
+            showMessage("Il manque " + picturesRequired + " images");
         }
     }
 
@@ -182,11 +199,13 @@ public class PictureChoice extends AppCompatActivity {
                     if ( clipData.getItemCount() <= picturesRequired){
                         imageUri = clipData.getItemAt(i).getUri();
                         addImageIfNotAlreadyInList();
+                        showMessage("Il manque " + picturesRequired + " images");
                     }
                 }
             }else {
                 imageUri = data.getData();
                 addImageIfNotAlreadyInList();
+                showMessage("Il manque " + picturesRequired + " images");
             }
         }
     }
@@ -198,4 +217,16 @@ public class PictureChoice extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (onResume == true){
+            uriList.clear();
+        }
+        onResume = false;
+    }
+
+    private void showMessage(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
 }

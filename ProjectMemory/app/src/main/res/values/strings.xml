@@ -11,5 +11,7 @@
     <string name="textView_pickAGrid">Choisissez les dimensions de la grille</string>
 
     <!-- Picture Choice -->
-    <string name="btn_goToGame">START</string>
+    <string name="btn_goToGame">COMMENCER LA PARTIE</string>
+    <string name="camera">PRENDRE UNE PHOTO</string>
+    <string name="gallery">PRENDRE UNE IMAGE DANS VOTRE GALERIE</string>
 </resources>
