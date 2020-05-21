@@ -67,7 +67,7 @@ public class PictureChoice extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (!isChoice){
-            notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
         }
         isChoice = false;
     }

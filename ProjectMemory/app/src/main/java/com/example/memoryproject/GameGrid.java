@@ -102,7 +102,7 @@ public class GameGrid extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-            notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
     }
 
     private void setImageViewsListeners(){

@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (!isPlay){
-            notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
         }
         isPlay = false;
     }
