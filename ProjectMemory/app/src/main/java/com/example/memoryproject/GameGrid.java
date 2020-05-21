@@ -60,7 +60,6 @@ public class GameGrid extends AppCompatActivity {
     AlphaAnimation animationFadeOut;
     Boolean canSelect;
     int pairsToFind;
-    boolean notification = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,9 +102,7 @@ public class GameGrid extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (!notification){
             notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
-        }
     }
 
     private void setImageViewsListeners(){

@@ -24,6 +24,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.memoryproject.Notification.NotificationService;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -44,7 +46,8 @@ public class PictureChoice extends AppCompatActivity {
     int picturesRequired;
     boolean isCaptured = false;
     boolean onResume = false;
-
+    private NotificationService notificationService;
+    Boolean isChoice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,16 +55,27 @@ public class PictureChoice extends AppCompatActivity {
         btnPickImage = findViewById(R.id.btn_pickImage);
         btnStartGame = findViewById(R.id.btn_goToGame);
         btnCapture =findViewById(R.id.btn_takeImage);
+        notificationService = new NotificationService();
+        isChoice = false;
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
         uriList = new ArrayList<>();
 
         setListener();
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!isChoice){
+            notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+        }
+        isChoice = false;
+    }
     private void setListener(){
         btnPickImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isChoice = true;
                 isCaptured = false;
                 permission();
                 intentContent();
@@ -71,6 +85,7 @@ public class PictureChoice extends AppCompatActivity {
         btnStartGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                isChoice = true;
                 startGame();
             }
         });
@@ -78,6 +93,7 @@ public class PictureChoice extends AppCompatActivity {
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isChoice = true;
                 isCaptured = true;
                 permissionCamera();
             }
