@@ -26,6 +26,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.memoryproject.Notification.NotificationService;
@@ -60,6 +61,7 @@ public class GameGrid extends AppCompatActivity {
     AlphaAnimation animationFadeOut;
     Boolean canSelect;
     int pairsToFind;
+    TextView txtPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class GameGrid extends AppCompatActivity {
         uriList        = new ArrayList<Uri>();
         gridLayout     = findViewById(R.id.gridLayoutGame);
         confirmationSound = MediaPlayer.create(this, R.raw.confirmationsound);
+        txtPoints      = findViewById(R.id.textView_points);
         createAnimations();
         canSelect = true;
         detectScreenSize();
@@ -102,7 +105,7 @@ public class GameGrid extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-            notificationService.NotificationBuilder(this,"Memory project","Ne part pas trop longtemps");
+        notificationService.sendNotificationForMessage();
     }
 
     private void setImageViewsListeners(){
@@ -164,6 +167,7 @@ public class GameGrid extends AppCompatActivity {
 
     private void removeValidPair(){
         points.AddPoints();
+        changePoints();
         firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         firstImageRevealed.setOnClickListener(null);
         firstImageRevealed.setAnimation(null);
@@ -183,6 +187,7 @@ public class GameGrid extends AppCompatActivity {
 
     private void hideWrongAnswer(){
         points.subtractPoints();
+        changePoints();
         Animation animation = new AlphaAnimation(1f, 0f);
         animation.setDuration(1000);
         animation.setFillAfter(true);
@@ -265,5 +270,9 @@ public class GameGrid extends AppCompatActivity {
         myPopup.setTitle(title);
         myPopup.setMessage(message);
         myPopup.show();
+    }
+
+    private void changePoints(){
+        txtPoints.setText(String.valueOf(points.getPoints()));
     }
 }

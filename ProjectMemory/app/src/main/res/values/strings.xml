@@ -10,6 +10,10 @@
     <string name="btn_6x6">6 x 6</string>
     <string name="textView_pickAGrid">Choisissez les dimensions de la grille</string>
 
+    <!--Game grid-->
+    <string name="pointsstring">Points:</string>
+    <string name="zero">0</string>
+
     <!-- Picture Choice -->
     <string name="btn_goToGame">COMMENCER LA PARTIE</string>
     <string name="camera">PRENDRE UNE PHOTO</string>

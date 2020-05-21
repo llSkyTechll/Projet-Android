@@ -16,8 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".GameGrid"></activity>
-        <activity android:name=".PictureChoice" />
+        <activity android:name=".GameGrid" android:screenOrientation="portrait"></activity>
+        <activity android:name=".PictureChoice" android:screenOrientation="portrait"/>
         <activity android:name=".GridChoice" />
         <activity android:name=".MainActivity">
             <intent-filter>

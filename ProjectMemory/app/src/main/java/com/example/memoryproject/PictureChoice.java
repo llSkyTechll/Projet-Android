@@ -222,6 +222,7 @@ public class PictureChoice extends AppCompatActivity {
         super.onResume();
         if (onResume == true){
             uriList.clear();
+            picturesRequired = intent.getIntExtra("picturesRequired",2);
         }
         onResume = false;
     }
