@@ -1,6 +1,7 @@
 package com.example.memoryproject;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
@@ -27,6 +28,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.memoryproject.Notification.NotificationService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +46,9 @@ public class GameGrid extends AppCompatActivity {
     ArrayList<Uri> uriList;
     int screenWidth;
     int screenHeight;
+    private GameGrid activity;
+    private GamePoints points;
+    private NotificationService notificationService;
     int imageRevealed = 0;
     Animation animFadeOut;
     Animation animFadeIn;
@@ -58,7 +64,10 @@ public class GameGrid extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_grid);
-
+        this.activity = this;
+        points = new GamePoints();
+        notificationService = new NotificationService();
+        points.setPoints(0);
         intent         = getIntent();
         gridSize       = intent.getIntExtra("gridSize", 4);
         uriStringList  = intent.getStringArrayListExtra("pictures");
@@ -86,6 +95,11 @@ public class GameGrid extends AppCompatActivity {
         animationFadeOut = new AlphaAnimation(1f, 0f);
         animationFadeOut.setDuration(1000);
         animationFadeOut.setFillAfter(true);
+    }
+        notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+        super.onStop();
+    protected void onStop() {
+    @Override
     }
 
     private void setImageViewsListeners(){
@@ -232,5 +246,11 @@ public class GameGrid extends AppCompatActivity {
     private void shuffleImageList(){
         Collections.shuffle(uriList);
     }
-    
+
+    private void popupCreator(String title, String message){
+        AlertDialog.Builder myPopup = new AlertDialog.Builder(activity);
+        myPopup.setTitle(title);
+        myPopup.setMessage(message);
+        myPopup.show();
+    }
 }
