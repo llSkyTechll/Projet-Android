@@ -22,7 +22,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
@@ -35,7 +34,6 @@ public class PictureChoice extends AppCompatActivity {
     Button btnPickImage;
     Button btnStartGame;
     Button btnCapture;
-    ImageView imageView;
     ArrayList<String> uriList;
     ClipData clipData;
     Uri imageUri;
@@ -45,6 +43,7 @@ public class PictureChoice extends AppCompatActivity {
     Intent intent;
     int picturesRequired;
     boolean isCaptured = false;
+    boolean onResume = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +52,6 @@ public class PictureChoice extends AppCompatActivity {
         btnPickImage = findViewById(R.id.btn_pickImage);
         btnStartGame = findViewById(R.id.btn_goToGame);
         btnCapture =findViewById(R.id.btn_takeImage);
-        imageView = findViewById(R.id.imageView);
         intent = getIntent();
         picturesRequired = intent.getIntExtra("picturesRequired",2);
         uriList = new ArrayList<>();
@@ -127,6 +125,8 @@ public class PictureChoice extends AppCompatActivity {
             uriList.add(imageUri.toString());
         }
         startGameIntent.putExtra("pictures", uriList);
+        Log.d("test", "startGame: " + uriList.size());
+        onResume = true;
         startActivity(startGameIntent);
     }
 
@@ -171,6 +171,7 @@ public class PictureChoice extends AppCompatActivity {
         if (resultCode == RESULT_OK){
             uriList.add(imageUri.toString());
             picturesRequired--;
+            showMessage("Il manque " + picturesRequired + " images");
         }
     }
 
@@ -182,11 +183,13 @@ public class PictureChoice extends AppCompatActivity {
                     if ( clipData.getItemCount() <= picturesRequired){
                         imageUri = clipData.getItemAt(i).getUri();
                         addImageIfNotAlreadyInList();
+                        showMessage("Il manque " + picturesRequired + " images");
                     }
                 }
             }else {
                 imageUri = data.getData();
                 addImageIfNotAlreadyInList();
+                showMessage("Il manque " + picturesRequired + " images");
             }
         }
     }
@@ -201,6 +204,13 @@ public class PictureChoice extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        uriList.clear();
+        if (onResume == true){
+            uriList.clear();
+        }
+        onResume = false;
+    }
+
+    private void showMessage(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

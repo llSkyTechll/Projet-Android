@@ -59,6 +59,8 @@ public class GameGrid extends AppCompatActivity {
     MediaPlayer confirmationSound;
     AlphaAnimation animationFadeOut;
     Boolean canSelect;
+    int pairsToFind;
+    boolean notification = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,7 @@ public class GameGrid extends AppCompatActivity {
         points.setPoints(0);
         intent         = getIntent();
         gridSize       = intent.getIntExtra("gridSize", 4);
+        pairsToFind    = gridSize / 2;
         uriStringList  = intent.getStringArrayListExtra("pictures");
         uriList        = new ArrayList<Uri>();
         gridLayout     = findViewById(R.id.gridLayoutGame);
@@ -96,10 +99,13 @@ public class GameGrid extends AppCompatActivity {
         animationFadeOut.setDuration(1000);
         animationFadeOut.setFillAfter(true);
     }
-        notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
-        super.onStop();
-    protected void onStop() {
+
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (!notification){
+            notificationService.NotificationBuilder(this,"Memory project","Get back!!!");
+        }
     }
 
     private void setImageViewsListeners(){
@@ -160,16 +166,26 @@ public class GameGrid extends AppCompatActivity {
     }
 
     private void removeValidPair(){
+        points.AddPoints();
         firstImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         firstImageRevealed.setOnClickListener(null);
         firstImageRevealed.setAnimation(null);
         secondImageRevealed.setImageResource(R.drawable.ic_launcher_foreground);
         secondImageRevealed.setOnClickListener(null);
         secondImageRevealed.setAnimation(null);
+        validateEndGame();
         canSelect = true;
     }
 
+    private void validateEndGame(){
+        pairsToFind--;
+        if (pairsToFind <= 0){
+            popupCreator("Victoire", "Félicitation! Partie terminé avec " + points.getPoints() + " points!");
+        }
+    }
+
     private void hideWrongAnswer(){
+        points.subtractPoints();
         Animation animation = new AlphaAnimation(1f, 0f);
         animation.setDuration(1000);
         animation.setFillAfter(true);
