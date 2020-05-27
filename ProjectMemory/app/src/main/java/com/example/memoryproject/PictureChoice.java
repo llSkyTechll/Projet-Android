@@ -164,12 +164,12 @@ public class PictureChoice extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (isCaptured){
-            setImage(resultCode);
+            setCameraImage(resultCode);
         } else {
-            getImages(requestCode, resultCode, data);
+            getGalleryImages(requestCode, resultCode, data);
         }
     }
-    private void setImage(int resultCode){
+    private void setCameraImage(int resultCode){
         if (resultCode == RESULT_OK){
             if (picturesRequired > 0) {
                 uriList.add(imageUri.toString());
@@ -179,7 +179,7 @@ public class PictureChoice extends AppCompatActivity {
         }
     }
 
-    private void getImages(int requestCode, int resultCode, @Nullable Intent data){
+    private void getGalleryImages(int requestCode, int resultCode, @Nullable Intent data){
         if (requestCode == 1 && resultCode == RESULT_OK){
             clipData = data.getClipData();
             if (clipData != null){
